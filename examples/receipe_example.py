@@ -27,3 +27,9 @@ class receipe_example():
 
     def getGPT(self):
         return self.gpt
+    
+    def getTitle(self):
+        return "How to cook stuff"
+    
+    def getSample(self):
+        return "how to make a breakfast burrito"

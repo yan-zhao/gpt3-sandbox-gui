@@ -3,11 +3,12 @@ import tkinter.scrolledtext
 import openai
 from api.gpt import GPT, Example, set_openai_key
 import json
-from examples.reicipe_example import reicipe_example
+from examples.receipe_example import receipe_example
 
-questionVar=None
+questionVar=None  # question variable for question entry widget
 KEY_NAME = "OPENAI_KEY"
-info = None
+output_text = None     #text widget for output
+example = None
 
 def getBlankExample():
     # Construct GPT object and show some examples
@@ -20,7 +21,6 @@ def getBlankExample():
 
 #Get GPT constructed in a example and then
 def runExample(prompt):
-    example = reicipe_example()
     gpt = example.getGPT()
 
     response = gpt.submit_request(prompt)
@@ -41,16 +41,44 @@ def runExample(prompt):
 def CloseApp():
     quit()
 
+#########################################################################
+#   Load Example
+#########################################################################
+def LoadExample():
+    global example
+    example = receipe_example()
+
+    #update gui
+    if example is not None:
+        title = example.getTitle()
+        frameInput.config(text = title)
+
+        sample = example.getSample()
+        questionVar.set(sample)
+
+        buttonSubmit.config(state="active")
+#########################################################################
+#   Submit question to GPT
+#########################################################################
 def Submit():
+    global example
+
+    if example is None:
+        tk.messagebox.showerror ("Error", "Failed to load example")
+        return
+
     #get the question
     prompt = questionVar.get()
 
     answer = runExample(prompt)
     if answer == None:
-        info.insert(tk.INSERT,'No Answer.')
+        output_text.insert(tk.INSERT,'No Answer.')
     else:
-        info.insert(tk.INSERT, answer['text'])
-    info.update_idletasks()
+        if answer['text']=="" or answer['text']=="\n":
+            output_text.insert(tk.INSERT,'No Answer.')
+        else:
+            output_text.insert(tk.INSERT, answer['text'])
+    output_text.update_idletasks()
 
 #########################################################################
 #   Main
@@ -79,20 +107,23 @@ if __name__ == "__main__":
 
     questionVar = tk.StringVar()       #store password input
 
-    passwordEntry = tk.Entry(frameInput, bd = 2, width = 50,  textvariable=questionVar)
-    passwordEntry.place(x=100, y=30)
+    questionEntry = tk.Entry(frameInput, bd = 2, width = 50,  textvariable=questionVar)
+    questionEntry.place(x=100, y=30)
 
     labelAnwser = tk.Label(frameInput, text='Answer:')
     labelAnwser.place(x=20, y=120)
 
-    info = tk.scrolledtext.ScrolledText(frameInput, width=50, height=6, bg='light gray')
-    info.place(x=20, y= 160)
-
-
+    output_text = tk.scrolledtext.ScrolledText(frameInput, width=50, height=6, bg='light gray')
+    output_text.place(x=20, y= 160)
+        
+    #get Example
+    buttonGetExample = tk.Button(frameInput, text="Get Example", width=20, height=2, command=LoadExample, bd=2)
+    buttonGetExample.place(x=20,y=60)
 
     #submit to GPT
-    buttonClose = tk.Button(frameInput, text="Submit", width=20, height=2, command=Submit, bd=2)
-    buttonClose.place(x=20,y=60)
+    buttonSubmit = tk.Button(frameInput, text="Submit", width=20, height=2, command=Submit, bd=2)
+    buttonSubmit.place(x=200,y=60)
+    buttonSubmit.config(state="disabled")
 
 
     #Close App
