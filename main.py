@@ -5,20 +5,13 @@ from api.gpt import GPT, Example, set_openai_key
 import json
 from examples.receipe_example import receipe_example
 from examples.analogies_example import analogies_example
+from examples.blank_example import *
 
 questionVar=None  # question variable for question entry widget
 KEY_NAME = "OPENAI_KEY"
 output_text = None     #text widget for output
 example = None
 
-def getBlankExample():
-    # Construct GPT object and show some examples
-    gpt = GPT(engine="davinci", temperature=0.5, max_tokens=100)
-
-    gpt.add_example(Example("Who are you?", "I'm an example."))
-    gpt.add_example(Example("What are you?", "I'm an example."))
-
-    return gpt
 
 #Get GPT constructed in a example and then
 def runExample(prompt):
@@ -48,8 +41,9 @@ def CloseApp():
 def LoadExample():
     global example
     #example = receipe_example()
-    example = analogies_example()
-
+    #example = analogies_example()
+    example = blank_example()
+    
     #update gui
     if example is not None:
         title = example.getTitle()
