@@ -4,6 +4,7 @@ import openai
 from api.gpt import GPT, Example, set_openai_key
 import json
 from examples.receipe_example import receipe_example
+from examples.analogies_example import analogies_example
 
 questionVar=None  # question variable for question entry widget
 KEY_NAME = "OPENAI_KEY"
@@ -46,7 +47,8 @@ def CloseApp():
 #########################################################################
 def LoadExample():
     global example
-    example = receipe_example()
+    #example = receipe_example()
+    example = analogies_example()
 
     #update gui
     if example is not None:
@@ -57,6 +59,8 @@ def LoadExample():
         questionVar.set(sample)
 
         buttonSubmit.config(state="active")
+    else:
+        tk.messagebox.showerror ("Error", "Failed to load example")
 #########################################################################
 #   Submit question to GPT
 #########################################################################
