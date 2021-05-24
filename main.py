@@ -1,5 +1,7 @@
 import tkinter as tk
-import tkinter.scrolledtext
+from  tkinter import scrolledtext
+from  tkinter import ttk
+
 import openai
 from api.gpt import GPT, Example, set_openai_key
 import json
@@ -45,8 +47,14 @@ def CloseApp():
 def LoadExample():
     global example
     
-    example_module = globals()[examples_classes[0]]  #get the module imported from [from examples import *]
-    example_class = getattr(example_module, examples_classes[0])    #examples_classes[0]
+    # get example from choosen of examples_choosen
+    example_select = exampleVar.get()
+    if example_select is None:
+        tk.messagebox.showerror ("Error", "Select a example first!") 
+        return
+
+    example_module = globals()[example_select]  #get the module imported from [from examples import *]
+    example_class = getattr(example_module, example_select)    #examples_classes[0]
     example = example_class()
     #example = latex_example.latex_example()
     
@@ -113,22 +121,31 @@ if __name__ == "__main__":
 
     questionEntry = tk.Entry(frameInput, bd = 2, width = 50,  textvariable=questionVar)
     questionEntry.place(x=100, y=30)
+    
+    label2 = tk.Label(frameInput, text='Examples: ')
+    label2.config(font=('Arial', 10))
+    label2.place(x=30, y = 60)
 
-    labelAnwser = tk.Label(frameInput, text='Answer:')
-    labelAnwser.place(x=20, y=120)
+    # Combobox creation
+    exampleVar = tk.StringVar()
+    examples_choosen = ttk.Combobox(frameInput, width = 50, textvariable = exampleVar, values=examples_classes)
+    examples_choosen.place(x=100,y=60)
+    examples_choosen.current(1)     #try select first one
 
-    output_text = tk.scrolledtext.ScrolledText(frameInput, width=50, height=6, bg='light gray')
-    output_text.place(x=20, y= 160)
-        
     #get Example
     buttonGetExample = tk.Button(frameInput, text="Get Example", width=20, height=2, command=LoadExample, bd=2)
-    buttonGetExample.place(x=20,y=60)
+    buttonGetExample.place(x=30,y=90)
 
     #submit to GPT
     buttonSubmit = tk.Button(frameInput, text="Submit", width=20, height=2, command=Submit, bd=2)
-    buttonSubmit.place(x=200,y=60)
+    buttonSubmit.place(x=200,y=90)
     buttonSubmit.config(state="disabled")
 
+    labelAnwser = tk.Label(frameInput, text='Answer:')
+    labelAnwser.place(x=20, y=135)
+
+    output_text = tk.scrolledtext.ScrolledText(frameInput, width=50, height=6, bg='light gray')
+    output_text.place(x=20, y= 160)
 
     #Close App
     buttonClose = tk.Button(mainWindow, text="Close", width=30, height=2, command=CloseApp, bd=2)
