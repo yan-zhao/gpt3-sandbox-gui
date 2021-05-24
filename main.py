@@ -3,15 +3,20 @@ import tkinter.scrolledtext
 import openai
 from api.gpt import GPT, Example, set_openai_key
 import json
-from examples.receipe_example import receipe_example
-from examples.analogies_example import analogies_example
-from examples.blank_example import *
+from examples import *   #all modules under examples
 
 questionVar=None  # question variable for question entry widget
 KEY_NAME = "OPENAI_KEY"
 output_text = None     #text widget for output
 example = None
 
+#list all examples
+import examples
+import pkgutil
+examples_classes = []
+for importer, modname, ispkg in pkgutil.iter_modules(examples.__path__):
+    if not ispkg:
+        examples_classes.append(modname)
 
 #Get GPT constructed in a example and then
 def runExample(prompt):
@@ -28,7 +33,6 @@ def runExample(prompt):
     return ret
     
 
-
 #########################################################################
 #   Class App
 #########################################################################
@@ -40,9 +44,11 @@ def CloseApp():
 #########################################################################
 def LoadExample():
     global example
-    #example = receipe_example()
-    #example = analogies_example()
-    example = blank_example()
+    
+    example_module = globals()[examples_classes[0]]  #get the module imported from [from examples import *]
+    example_class = getattr(example_module, examples_classes[0])    #examples_classes[0]
+    example = example_class()
+    #example = latex_example.latex_example()
     
     #update gui
     if example is not None:
